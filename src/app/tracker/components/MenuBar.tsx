@@ -26,7 +26,7 @@ import {
   today,
 } from "@internationalized/date";
 
-import { LogOut, Menu } from "react-feather";
+import { LogOut, Menu, LogIn } from "react-feather";
 
 import { setStopRunningEvents } from "../serverActions/userActions";
 
@@ -96,7 +96,7 @@ export default function MenuBar({ user }: MenuBarProps) {
                 router.replace("/tracker/login");
               }}
             >
-              <LogOut scale={-1} />
+              {user.username === "dummy" ? <LogIn /> : <LogOut />}
             </Button>
           </DrawerHeader>
           <DrawerBody>
