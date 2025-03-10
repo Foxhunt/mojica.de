@@ -18,7 +18,7 @@
     "@emotion/react": "^11.13.3",
     "@internationalized/date": "3.7.0",
     "@next/bundle-analyzer": "^15.0.4",
-    "@heroui/react": "2.7.4",
+    "@heroui/react": "2.7.5",
     "@payloadcms/db-mongodb": "^3.9.0",
     "@payloadcms/next": "^3.0.1",
     "@payloadcms/richtext-lexical": "^3.0.1",
