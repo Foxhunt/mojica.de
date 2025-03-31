@@ -1,6 +1,8 @@
-import { Access } from "payload";
+import { Access, getPayload } from "payload";
+import config from "@payload-config";
+import { User } from "../../payload-types";
 
-export const belongsToUser: Access = ({ req: { user } }) => {
+export const belongsToUser: Access = async ({ req: { user } }) => {
   if (user) {
     if (user.collection === "admins") {
       return true;
@@ -13,11 +15,23 @@ export const belongsToUser: Access = ({ req: { user } }) => {
     }
   }
 
-  return false;
+  const payload = await getPayload({ config });
+  const dummyUser = await payload.db.findOne<User>({
+    collection: "users",
+    where: {
+      username: { equals: "dummy" },
+    },
+  });
+
+  return {
+    user: {
+      equals: dummyUser!.id,
+    },
+  };
 };
 
 export const isAuthenticated: Access = ({ req: { user } }) => {
-  return Boolean(user);
+  return true;
 };
 
 export const isAdmin: Access = ({ req: { user } }) => {
