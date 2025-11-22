@@ -6,14 +6,18 @@ import {
   Skeleton,
   Stack,
 } from "@chakra-ui/react";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { useState } from "react";
 
+interface Message {
+  role: "user" | "model";
+  parts: { text: string }[];
+}
+
 export default function MarcoGPT() {
-  const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([
+  const [messages, setMessages] = useState<Message[]>([
     {
-      role: "assistant",
-      content: "Hallo, wie kann ich dir helfen?",
+      role: "model",
+      parts: [{ text: "Hallo, wie kann ich dir helfen?" }],
     },
   ]);
   const [input, setInput] = useState("");
@@ -22,7 +26,8 @@ export default function MarcoGPT() {
   const complete = async (event) => {
     event.preventDefault();
 
-    setMessages((messages) => [...messages, { role: "user", content: input }]);
+    const userMessage: Message = { role: "user", parts: [{ text: input }] };
+    setMessages((messages) => [...messages, userMessage]);
     setInput("");
     setIsTyping(true);
 
@@ -33,11 +38,20 @@ export default function MarcoGPT() {
       },
       body: JSON.stringify({
         input,
-        messages,
+        messages: [...messages, userMessage],
       }),
     });
 
-    const { message } = await response.json();
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("API Error:", data.error);
+      // Optionally show error to user
+      setIsTyping(false);
+      return;
+    }
+
+    const { message } = data;
 
     setIsTyping(false);
     setMessages((messages) => [...messages, message]);
@@ -70,7 +84,7 @@ export default function MarcoGPT() {
                 }
               }}
             >
-              {typeof message.content === "string" && message.content}
+              {message.parts[0].text}
             </Box>
           ))}
           {isTyping && (

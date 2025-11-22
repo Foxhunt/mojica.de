@@ -1,12 +1,10 @@
 import { kv } from "@vercel/kv";
 import { NextApiRequest, NextApiResponse } from "next";
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 
 const systemPrompt = process.env.SYSTEM_PROMPT!.replace(/\\n/g, "\n");
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const client = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,20 +12,31 @@ export default async function handler(
 ) {
   const { input, messages } = req.body;
 
-  console.log("messages:", messages);
-  console.log("input:", input);
-
   await kv.rpush("inputs", input);
 
-  const chatCompletion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    max_tokens: 256,
-    messages: [
-      { role: "system", content: systemPrompt },
-      ...messages,
-      { role: "user", content: input },
-    ],
-  });
+  // Messages are already in Gemini format
+  const history = messages;
 
-  res.status(200).json({ message: chatCompletion.choices[0].message });
+  try {
+    const chat = client.chats.create({
+      model: "models/gemini-flash-lite-latest",
+      config: {
+        systemInstruction: systemPrompt,
+      },
+      history: history,
+    });
+
+    const result = await chat.sendMessage({ message: input });
+    const text = result.text;
+
+    res.status(200).json({
+      message: {
+        role: "model",
+        parts: [{ text: text }],
+      },
+    });
+  } catch (error) {
+    console.error("Error calling Gemini API:", error);
+    res.status(500).json({ error: "Failed to generate response" });
+  }
 }
