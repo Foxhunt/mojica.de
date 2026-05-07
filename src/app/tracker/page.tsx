@@ -66,7 +66,7 @@ export default async function TrackerPage({
       ],
     },
     pagination: false,
-    overrideAccess: false,
+    overrideAccess: user.username === "dummy",
     user,
   });
 
@@ -79,14 +79,14 @@ export default async function TrackerPage({
       },
     },
     pagination: false,
-    overrideAccess: false,
+    overrideAccess: user.username === "dummy",
     user,
   });
 
   const eventTypes = payload.find({
     collection: "EventTypes",
     pagination: false,
-    overrideAccess: false,
+    overrideAccess: user.username === "dummy",
     user,
   });
 
