@@ -23,7 +23,7 @@
     "@payloadcms/db-mongodb": "^3.9.0",
     "@payloadcms/next": "^3.0.1",
     "@payloadcms/richtext-lexical": "^3.0.1",
-    "@vercel/analytics": "^1.4.1",
+    "@vercel/analytics": "^2.0.0",
     "@vercel/kv": "^3.0.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.13.1",
